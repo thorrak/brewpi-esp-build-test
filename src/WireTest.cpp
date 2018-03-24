@@ -1,6 +1,7 @@
 #include "WireTest.h"
 
 #include <FS.h>  // Apparently this needs to be first
+#include <ESP8266WiFi.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include "IicLcd.h"
@@ -10,29 +11,76 @@
 
 IIClcd LCDDisplay(0x27, 20, 4);
 
+
+void reset_wifi()
+{
+    /* reset_wifi() both resets the WiFi (by running Wifi.disconnect()) and reinitializes SPIFFS */
+
+    // First, clear everything from serial/LCD
+    LCDDisplay.clear();
+    Serial.println();
+    Serial.println();
+
+    // Then reset the WiFi (should be quick)
+    LCDDisplay.printAt_P(0,0,"Resetting WiFi");
+    Serial.print("Disconnecting WiFi... ");
+    WiFi.disconnect(true);
+    delay(1000);  // Delay to give the radio time to do its thing
+
+    if(WiFi.status() != WL_CONNECTED) {
+        LCDDisplay.printAt_P(0,1,"...disconnected!");
+        Serial.print("...disconnected!");
+        delay(1000);
+    } else {
+        LCDDisplay.printAt_P(0,1,"...failed.");
+        Serial.print("...failed.");
+        delay(1000);
+    }
+
+    LCDDisplay.clear();
+
+    // Next, reset (reinitialize) SPIFFS
+    LCDDisplay.printAt_P(0,0,"Resetting SPIFFS");
+    Serial.print("\r\n\r\nResetting SPIFFS...\r\n");
+    LCDDisplay.printAt_P(0,1,"This may take 1min+");
+
+    SPIFFS.begin();
+
+    Serial.println("Please wait up to 30 secs for SPIFFS to be formatted");
+    SPIFFS.format();
+    Serial.println("Spiffs formatted!\r\n");
+    LCDDisplay.printAt_P(0,2,"...done!");
+
+    Serial.println("You can now disconnect your ESP8266 and reflash with the final firmware.");
+
+    delay(1000);
+    LCDDisplay.clear();
+}
+
+
 void relay_test()
 {
     Serial.println("Beginning relay test...");
     LCDDisplay.clear();
     LCDDisplay.printAt_P(0,0,"Relay Test:");
 
-    Serial.println("Turning on 'cool' for 10 seconds");
+    Serial.println("Turning on 'cool' for 7 seconds");
     LCDDisplay.printAt_P(0,1,"Turning 'cool' on");
     digitalWrite(coolingPin, LOW);
-    delay(10000);
-    Serial.println("Turning off 'cool' and waiting for 5 seconds");
+    delay(7000);
+    Serial.println("Turning off 'cool' and waiting for 3 seconds");
     digitalWrite(coolingPin, HIGH);
     LCDDisplay.printAt_P(0,1,"Wait - Cool off  ");
-    delay(5000);
+    delay(3000);
 
-    Serial.println("Turning on 'heat' for 10 seconds");
+    Serial.println("Turning on 'heat' for 7 seconds");
     LCDDisplay.printAt_P(0,1,"Turning 'heat' on");
     digitalWrite(heatingPin, LOW);
-    delay(10000);
-    Serial.println("Turning off 'heat' and waiting for 5 seconds");
+    delay(7000);
+    Serial.println("Turning off 'heat' and waiting for 3 seconds");
     digitalWrite(heatingPin, HIGH);
     LCDDisplay.printAt_P(0,1,"Wait - Heat off  ");
-    delay(5000);
+    delay(3000);
 
 
     Serial.println("Done with relay test!\r\n");
@@ -55,9 +103,9 @@ void run_tests()
     delay(50);
 
     LCD_test();
-    relay_test();
     run_temp_test(LCDDisplay);
-
+    relay_test();
+    reset_wifi();
     LCDDisplay.clear();
     LCDDisplay.printAt_P(0,0,"Done with tests");
 

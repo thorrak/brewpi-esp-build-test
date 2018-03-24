@@ -38,7 +38,7 @@ void run_temp_test(IIClcd LCDDisplay)
 
     LCDDisplay.printAt_P(0,3,"Found ");
     LCDDisplay.print(sensors.getDeviceCount(), DEC);
-    LCDDisplay.print("Devices");
+    LCDDisplay.print(" Devices");
 
     // report parasite power requirements
     Serial.print("Parasite power is: ");
