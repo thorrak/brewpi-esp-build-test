@@ -44,8 +44,8 @@
 #define coolingPin 26
 
 // If oneWirePin is specified, beerSensorPin and fridgeSensorPin are ignored
-#define oneWirePin 34  // Note - 34 is "input only" and shouldn't be repurposed
-#define doorPin    13
+#define oneWirePin 13  
+#define doorPin    34  // Note - 34 is "input only" and shouldn't be repurposed
 
 #define IIC_SDA 21
 #define IIC_SCL 22
