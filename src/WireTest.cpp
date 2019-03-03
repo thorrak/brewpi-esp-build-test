@@ -1,7 +1,13 @@
 #include "WireTest.h"
 
 #include <FS.h>  // Apparently this needs to be first
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
+#elif defined(ESP32)
+#include <WiFi.h>
+#include <SPIFFS.h>
+#endif
+
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include "IicLcd.h"
@@ -51,7 +57,7 @@ void reset_wifi()
     Serial.println("Spiffs formatted!\r\n");
     LCDDisplay.printAt_P(0,2,"...done!");
 
-    Serial.println("You can now disconnect your ESP8266 and reflash with the final firmware.");
+    Serial.println("You can now disconnect your ESP and reflash with the final firmware.");
 
     delay(1000);
     LCDDisplay.clear();

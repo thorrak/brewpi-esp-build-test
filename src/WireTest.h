@@ -7,7 +7,7 @@
 
 
 
-
+#if defined(ESP8266)
 
 #define NODEMCU_PIN_A0 17	// Analog
 
@@ -36,6 +36,29 @@
 
 #define IIC_SDA NODEMCU_PIN_D2
 #define IIC_SCL NODEMCU_PIN_D1
+
+
+#elif defined(ESP32)
+
+#define heatingPin 25
+#define coolingPin 26
+
+// If oneWirePin is specified, beerSensorPin and fridgeSensorPin are ignored
+#define oneWirePin 34  // Note - 34 is "input only" and shouldn't be repurposed
+#define doorPin    13
+
+#define IIC_SDA 21
+#define IIC_SCL 22
+
+
+// Pay attention when changing the pins for the rotary encoder.
+// They should be connected to external interrupt INT0, INT1 and INT3
+//#define rotaryAPin 19 // INT1?
+//#define rotaryBPin 18 // INT3?
+//#define rotarySwitchPin 23 // INT2?
+
+
+#endif
 
 
 #endif //BREWPI_ESP8266_WIRE_TEST_WIRETEST_H
