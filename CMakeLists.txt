@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
-project(brewpi-esp8266-wire-test)
+project(brewpi-esp8266-build-test)
 
 include(CMakeListsPrivate.txt)
 
@@ -18,6 +18,12 @@ add_custom_target(
 add_custom_target(
     PLATFORMIO_CLEAN ALL
     COMMAND ${PLATFORMIO_CMD} -f -c clion run --target clean
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+add_custom_target(
+    PLATFORMIO_TEST ALL
+    COMMAND ${PLATFORMIO_CMD} -f -c clion test
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 

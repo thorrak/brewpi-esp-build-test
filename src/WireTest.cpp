@@ -1,12 +1,19 @@
 #include "WireTest.h"
 
 #include <FS.h>  // Apparently this needs to be first
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
+#elif defined(ESP32)
+#include <WiFi.h>
+#include <SPIFFS.h>
+#endif
+
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include "IicLcd.h"
 
 #include "OneWireTest.h"
+#include "RotaryEncoderTest.h"
 
 
 IIClcd LCDDisplay(0x27, 20, 4);
@@ -51,7 +58,7 @@ void reset_wifi()
     Serial.println("Spiffs formatted!\r\n");
     LCDDisplay.printAt_P(0,2,"...done!");
 
-    Serial.println("You can now disconnect your ESP8266 and reflash with the final firmware.");
+    Serial.println("You can now disconnect your ESP and reflash with the final firmware.");
 
     delay(1000);
     LCDDisplay.clear();
@@ -135,11 +142,18 @@ void setup()
 
 
     run_tests();
+    
+#if defined(ESP32)
+    Serial.println("Dropping into rotary encoder test");
+    rotaryenc_setup();
+#endif
+
 }
 
 void loop()
 {
     // Do nothing.
-    delay(2000);
+    //delay(2000);
+    rotaryenc_loop();
 
 }

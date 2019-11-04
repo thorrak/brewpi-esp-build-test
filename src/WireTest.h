@@ -7,7 +7,7 @@
 
 
 
-
+#if defined(ESP8266)
 
 #define NODEMCU_PIN_A0 17	// Analog
 
@@ -36,6 +36,36 @@
 
 #define IIC_SDA NODEMCU_PIN_D2
 #define IIC_SCL NODEMCU_PIN_D1
+
+
+#elif defined(ESP32)
+
+#define heatingPin 25
+#define coolingPin 26
+
+// If oneWirePin is specified, beerSensorPin and fridgeSensorPin are ignored
+#define oneWirePin 13  
+#define doorPin    34  // Note - 34 is "input only" and shouldn't be repurposed
+
+#define IIC_SDA 21
+#define IIC_SCL 22
+
+
+/*
+connecting Rotary encoder
+CLK (A pin) - to any microcontroler intput pin with interrupt -> in this example pin 32
+DT (B pin) - to any microcontroler intput pin with interrupt -> in this example pin 21
+SW (button pin) - to any microcontroler intput pin -> in this example pin 25
+VCC - to microcontroler VCC (then set ROTARY_ENCODER_VCC_PIN -1) or in this example pin 25
+GND - to microcontroler GND
+*/
+#define ROTARY_ENCODER_A_PIN 19
+#define ROTARY_ENCODER_B_PIN 18
+#define ROTARY_ENCODER_BUTTON_PIN 0
+#define ROTARY_ENCODER_VCC_PIN -1 /*put -1 of Rotary encoder Vcc is connected directly to 3,3V; else you can use declared output pin for powering rotary encoder */
+
+
+#endif
 
 
 #endif //BREWPI_ESP8266_WIRE_TEST_WIRETEST_H
