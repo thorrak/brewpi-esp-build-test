@@ -13,6 +13,7 @@
 #include "IicLcd.h"
 
 #include "OneWireTest.h"
+#include "RotaryEncoderTest.h"
 
 
 IIClcd LCDDisplay(0x27, 20, 4);
@@ -141,11 +142,17 @@ void setup()
 
 
     run_tests();
+
+    Serial.println("Dropping into rotary encoder test");
+    rotaryenc_setup();
+
+
 }
 
 void loop()
 {
     // Do nothing.
-    delay(2000);
+    //delay(2000);
+    rotaryenc_loop();
 
 }
