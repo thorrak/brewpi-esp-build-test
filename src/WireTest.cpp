@@ -142,10 +142,11 @@ void setup()
 
 
     run_tests();
-
+    
+#if defined(ESP32)
     Serial.println("Dropping into rotary encoder test");
     rotaryenc_setup();
-
+#endif
 
 }
 

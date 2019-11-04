@@ -2,24 +2,13 @@
 // Created by John Beeler on 4/1/19.
 //
 
+#include "WireTest.h"
 #include "AiEsp32RotaryEncoder.h"
 #include "Arduino.h"
 #include "IicLcd.h"
 extern IIClcd LCDDisplay;
 
-
-/*
-connecting Rotary encoder
-CLK (A pin) - to any microcontroler intput pin with interrupt -> in this example pin 32
-DT (B pin) - to any microcontroler intput pin with interrupt -> in this example pin 21
-SW (button pin) - to any microcontroler intput pin -> in this example pin 25
-VCC - to microcontroler VCC (then set ROTARY_ENCODER_VCC_PIN -1) or in this example pin 25
-GND - to microcontroler GND
-*/
-#define ROTARY_ENCODER_A_PIN 19
-#define ROTARY_ENCODER_B_PIN 18
-#define ROTARY_ENCODER_BUTTON_PIN 0
-#define ROTARY_ENCODER_VCC_PIN -1 /*put -1 of Rotary encoder Vcc is connected directly to 3,3V; else you can use declared output pin for powering rotary encoder */
+#if defined(ESP32)
 
 AiEsp32RotaryEncoder rotaryEncoder = AiEsp32RotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN, ROTARY_ENCODER_BUTTON_PIN, ROTARY_ENCODER_VCC_PIN);
 
@@ -87,3 +76,4 @@ void rotaryenc_loop() {
     delay(50);
     if (millis()>20000) rotaryEncoder.enable ();
 }
+#endif
