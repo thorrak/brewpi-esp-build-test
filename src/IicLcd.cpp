@@ -13,9 +13,6 @@
 #include "IicLcd.h"
 #include "WireTest.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <inttypes.h>
 #include <inttypes.h>
 #include <Arduino.h>
 
@@ -46,10 +43,11 @@ extern "C" {
 
 IIClcd::IIClcd(uint8_t lcd_Addr, uint8_t lcd_cols, uint8_t lcd_rows)
 {
-	_Addr = lcd_Addr;  // This now gets ignored
+	_Addr = 0x0;  // This now gets ignored
 	_cols = lcd_cols;
 	_rows = lcd_rows;
 	_backlightval = LCD_NOBACKLIGHT;
+    _backlightTime = 0;
 }
 
 void IIClcd::scan_address() {
@@ -63,14 +61,18 @@ void IIClcd::scan_address() {
 			_Addr = i;
 			i = 120;
 			delay(1);
+			Serial.print("Found I2C Device: ");
+			Serial.println(_Addr);
 		}
 	}
+	if(_Addr==0x0)
+        Serial.println("No I2C Device Found");
 }
 
 
-void IIClcd::init() {
-	init_priv();
-	_backlightTime = 0;
+bool IIClcd::init() {
+    init_priv();
+    return _Addr != 0x0;
 }
 
 
@@ -78,8 +80,12 @@ void IIClcd::init_priv()
 {
 	Wire.begin(IIC_SDA, IIC_SCL);
 	scan_address();
+
+	if(_Addr == 0x0)
+	    return;
 	_displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
 	begin(_cols, _rows);
+    backlight();
 }
 
 void IIClcd::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
@@ -271,7 +277,7 @@ inline size_t IIClcd::write(uint8_t value) {
 	if (!_bufferOnly) {
 		send(value, Rs);
 	}
-	return 0;
+	return 1;
 }
 
 /************ low level data pushing commands **********/
@@ -307,7 +313,7 @@ void IIClcd::pulseEnable(uint8_t _data) {
 
 void IIClcd::updateBacklight(void) {
 	// True = OFF, False = ON
-    backlight();
+//    backlight();
 }
 
 // Puts the content of one LCD line into the provided buffer.

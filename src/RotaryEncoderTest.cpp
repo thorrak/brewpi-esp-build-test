@@ -5,8 +5,12 @@
 #include "WireTest.h"
 #include "AiEsp32RotaryEncoder.h"
 #include "Arduino.h"
-#include "IicLcd.h"
-extern IIClcd LCDDisplay;
+#include "LCDDisplay.h"
+
+#include <string>
+#include <sstream>
+
+extern LCDDisplay Display;
 
 #if defined(ESP32)
 
@@ -22,6 +26,8 @@ void rotary_onButtonClick() {
 }
 
 void rotary_loop() {
+    std::ostringstream s;
+
     //first lets handle rotary encoder button click
     if (rotaryEncoder.currentButtonState() == BUT_RELEASED) {
         //we can process it here or call separate function like:
@@ -49,17 +55,16 @@ void rotary_loop() {
         Serial.print("Value: ");
         Serial.println(encoderValue);
 
-        LCDDisplay.printAt_P(0,1,"Value: ");
-        LCDDisplay.print(encoderValue);
-
+        s << "Value: " << encoderValue;
+        Display.printAt_P(0,1,s.str().c_str());
     }
 
 }
 
 void rotaryenc_setup() {
 
-    LCDDisplay.clear();
-    LCDDisplay.printAt_P(0,0,"Rotary Encoder Test:");
+    Display.clear();
+    Display.printAt_P(0,0,"Rotary Encoder Test:");
 
 
     //we must initialize rorary encoder

@@ -8,10 +8,10 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-void run_temp_test(IIClcd LCDDisplay);
-void printAddress(DeviceAddress deviceAddress, IIClcd LCDDisplay);
-void printTemperature(DeviceAddress deviceAddress, IIClcd LCDDisplay);
-void print_temp_loop(IIClcd LCDDisplay);
+void run_temp_test();
+void printAddress(DeviceAddress deviceAddress);
+void printTemperature(DeviceAddress deviceAddress);
+void print_temp_loop();
 
 
 #endif //BREWPI_ESP8266_WIRE_TEST_ONEWIRETEST_H

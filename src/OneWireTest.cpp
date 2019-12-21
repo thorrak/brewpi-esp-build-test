@@ -1,10 +1,12 @@
 #include "OneWireTest.h"
-#include "IicLcd.h"
+#include "LCDDisplay.h"
 
 
 // Include the libraries we need
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <string>
+#include <sstream>
 
 #define TEMPERATURE_PRECISION 9
 
@@ -17,9 +19,13 @@ DallasTemperature sensors(&oneWire);
 // arrays to hold device addresses
 DeviceAddress insideThermometer, outsideThermometer;
 
-void run_temp_test(IIClcd LCDDisplay)
+extern LCDDisplay Display;
+
+void run_temp_test()
 {
-    Serial.println("Dallas Temperature IC Control Library Demo");
+    std::ostringstream s;
+
+    Serial.println("Dallas Temperature IC Test");
 
     // Start up the library
     sensors.begin();
@@ -30,12 +36,12 @@ void run_temp_test(IIClcd LCDDisplay)
     Serial.print(sensors.getDeviceCount(), DEC);
     Serial.println(" devices.");
 
-    LCDDisplay.clear();
-    LCDDisplay.printAt_P(0,0,"OneWire Test:");
+    Display.clear();
+    Display.printAt_P(0,0,"OneWire Test:");
 
-    LCDDisplay.printAt_P(0,3,"Found ");
-    LCDDisplay.print(sensors.getDeviceCount(), DEC);
-    LCDDisplay.print(" Devices");
+    s << "Found " << (int) sensors.getDeviceCount() << " Devices";
+
+    Display.printAt_P(0,3,s.str().c_str());
 
     // report parasite power requirements
     Serial.print("Parasite power is: ");
@@ -43,14 +49,14 @@ void run_temp_test(IIClcd LCDDisplay)
         // Parasite power mode isn't supported in BrewPi installations at the moment
         // This may be an arbitrary decision, but I'm assuming it creates issues for reading the temperature
         Serial.println("ON");
-        LCDDisplay.printAt_P(0,1,"Parasite ON!");
-        LCDDisplay.printAt_P(0,2,"This is not good!");
+        Display.printAt_P(0,1,"Parasite ON!");
+        Display.printAt_P(0,2,"This is not good!");
         Serial.println("Note - This isn't good. BrewPi doesn't support this configuration.");
         Serial.println("Please rewire your temperature sensors to have explicit +3.3v power in.");
         delay(2000);
     } else {
         Serial.println("OFF");
-        LCDDisplay.printAt_P(0,1,"Parasite Off");
+        Display.printAt_P(0,1,"Parasite Off");
     }
 
     Serial.println("Waiting 5 seconds before continuing");
@@ -80,26 +86,28 @@ void run_temp_test(IIClcd LCDDisplay)
     // assigns the seconds address found to outsideThermometer
     //if (!oneWire.search(outsideThermometer)) Serial.println("Unable to find address for outsideThermometer");
 
-    LCDDisplay.clear();
-    LCDDisplay.printAt_P(0,0,"OneWire Test:");
+    Display.clear();
+    Display.printAt_P(0,0,"OneWire Test:");
 
-    int i = 0;
+    uint8_t i = 0;
     while(oneWire.search(insideThermometer)) {
 
         Serial.print("Device ");
         Serial.print(i);
         Serial.print(" Address: ");
 
-        LCDDisplay.printAt_P(0,1,"Device ");
-        LCDDisplay.print(i);
-        LCDDisplay.print(" Address:");
+        s.str("");
+        s.clear();
+        s << "Device " << (int) i << " Address:";
+        Display.printAt_P(0,1,s.str().c_str());
 
-        printAddress(insideThermometer, LCDDisplay);
+        printAddress(insideThermometer);
         sensors.requestTemperatures();
+        delay(300);
         Serial.println();
-        printTemperature(insideThermometer, LCDDisplay);
+        printTemperature(insideThermometer);
 
-        delay(3000);
+        delay(2700);
 
         i++;
 
@@ -109,43 +117,46 @@ void run_temp_test(IIClcd LCDDisplay)
 }
 
 // function to print a device address
-void printAddress(DeviceAddress deviceAddress, IIClcd LCDDisplay)
+void printAddress(DeviceAddress deviceAddress)
 {
+    std::ostringstream s;
+
     for (uint8_t i = 0; i < 8; i++)
     {
-        LCDDisplay.setCursor(0, 2);
-
         // zero pad the address if necessary
         if (deviceAddress[i] < 16) {
             Serial.print("0");
-            LCDDisplay.print("0");
+            s << "0";
         }
         Serial.print(deviceAddress[i], HEX);
-        LCDDisplay.print(deviceAddress[i], HEX);
+        s << (int) deviceAddress[i];
     }
+
+    Display.printAt_P(0,2,s.str().c_str());
 }
 
 // function to print the temperature for a device
-void printTemperature(DeviceAddress deviceAddress, IIClcd LCDDisplay)
+void printTemperature(DeviceAddress deviceAddress)
 {
+    std::ostringstream s;
+    s.precision(3);
     float tempC = sensors.getTempC(deviceAddress);
     Serial.print("Temp C: ");
-    LCDDisplay.printAt_P(0,3,"Temp C: ");
     Serial.print(tempC);
-    LCDDisplay.print(tempC);
-    LCDDisplay.print(", F:");
     Serial.print(" Temp F: ");
     Serial.print(DallasTemperature::toFahrenheit(tempC));
-    LCDDisplay.print(DallasTemperature::toFahrenheit(tempC));
+
+    s << "Temp C:" << tempC << ",F:" << DallasTemperature::toFahrenheit(tempC);
+    Display.printAt_P(0,3,s.str().c_str());
 }
 
-// function to print a device's resolution
-void printResolution(DeviceAddress deviceAddress)
-{
-    Serial.print("Resolution: ");
-    Serial.print(sensors.getResolution(deviceAddress));
-    Serial.println();
-}
+//// function to print a device's resolution
+//void printResolution(DeviceAddress deviceAddress)
+//{
+//    Serial.print("Resolution: ");
+//    Serial.print(sensors.getResolution(deviceAddress));
+//    Serial.println();
+//}
 
 //// main function to print information about a device
 //void printData(DeviceAddress deviceAddress)
@@ -156,20 +167,3 @@ void printResolution(DeviceAddress deviceAddress)
 //    printTemperature(deviceAddress);
 //    Serial.println();
 //}
-
-/*
- * Main function, calls the temperatures in a loop.
- */
-void print_temp_loop(IIClcd LCDDisplay)
-{
-    // call sensors.requestTemperatures() to issue a global temperature
-    // request to all devices on the bus
-    Serial.print("Requesting temperatures...");
-    sensors.requestTemperatures();
-    Serial.println("DONE");
-
-    // print the device information
-//    printData(insideThermometer);
-//    printData(outsideThermometer);
-}
-

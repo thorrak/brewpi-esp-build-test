@@ -56,7 +56,7 @@ public:
 	IIClcd(uint8_t lcd_Addr, uint8_t lcd_cols, uint8_t lcd_rows);
 	~IIClcd() {};
 
-	void init();
+	bool init();
 
 	void begin(uint8_t cols, uint8_t rows, uint8_t charsize = LCD_5x8DOTS);
 
@@ -152,5 +152,3 @@ private:
 };
 
 #endif
-
-extern bool toggleBacklight;  // To allow us to toggle the backlight

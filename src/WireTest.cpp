@@ -10,13 +10,16 @@
 
 #include <OneWire.h>
 #include <DallasTemperature.h>
-#include "IicLcd.h"
+#include "LCDDisplay.h"
 
 #include "OneWireTest.h"
 #include "RotaryEncoderTest.h"
 
 
-IIClcd LCDDisplay(0x27, 20, 4);
+IIClcd I2C_Display(0x27, 20, 4);
+TFTDisplay TFT_Display;
+
+LCDDisplay Display;
 
 
 void reset_wifi()
@@ -24,69 +27,68 @@ void reset_wifi()
     /* reset_wifi() both resets the WiFi (by running Wifi.disconnect()) and reinitializes SPIFFS */
 
     // First, clear everything from serial/LCD
-    LCDDisplay.clear();
+    Display.clear();
     Serial.println();
     Serial.println();
 
     // Then reset the WiFi (should be quick)
-    LCDDisplay.printAt_P(0,0,"Resetting WiFi");
+    Display.printAt_P(0, 0, "Resetting WiFi");
     Serial.print("Disconnecting WiFi... ");
     WiFi.disconnect(true);
     delay(1000);  // Delay to give the radio time to do its thing
 
     if(WiFi.status() != WL_CONNECTED) {
-        LCDDisplay.printAt_P(0,1,"...disconnected!");
+        Display.printAt_P(0, 1, "...disconnected!");
         Serial.print("...disconnected!");
-        delay(1000);
     } else {
-        LCDDisplay.printAt_P(0,1,"...failed.");
+        Display.printAt_P(0, 1, "...failed.");
         Serial.print("...failed.");
-        delay(1000);
     }
 
-    LCDDisplay.clear();
+    delay(1000);
+    Display.clear();
 
     // Next, reset (reinitialize) SPIFFS
-    LCDDisplay.printAt_P(0,0,"Resetting SPIFFS");
+    Display.printAt_P(0, 0, "Resetting SPIFFS");
     Serial.print("\r\n\r\nResetting SPIFFS...\r\n");
-    LCDDisplay.printAt_P(0,1,"This may take 1min+");
+    Display.printAt_P(0, 1, "This may take 1min+");
 
     SPIFFS.begin();
 
     Serial.println("Please wait up to 30 secs for SPIFFS to be formatted");
     SPIFFS.format();
     Serial.println("Spiffs formatted!\r\n");
-    LCDDisplay.printAt_P(0,2,"...done!");
+    Display.printAt_P(0, 2, "...done!");
 
     Serial.println("You can now disconnect your ESP and reflash with the final firmware.");
 
     delay(1000);
-    LCDDisplay.clear();
+    Display.clear();
 }
 
 
 void relay_test()
 {
     Serial.println("Beginning relay test...");
-    LCDDisplay.clear();
-    LCDDisplay.printAt_P(0,0,"Relay Test:");
+    Display.clear();
+    Display.printAt_P(0, 0, "Relay Test:");
 
     Serial.println("Turning on 'cool' for 7 seconds");
-    LCDDisplay.printAt_P(0,1,"Turning 'cool' on");
+    Display.printAt_P(0, 1, "Turning 'cool' on");
     digitalWrite(coolingPin, LOW);
     delay(7000);
     Serial.println("Turning off 'cool' and waiting for 3 seconds");
     digitalWrite(coolingPin, HIGH);
-    LCDDisplay.printAt_P(0,1,"Wait - Cool off  ");
+    Display.printAt_P(0, 1, "Wait - Cool off  ");
     delay(3000);
 
     Serial.println("Turning on 'heat' for 7 seconds");
-    LCDDisplay.printAt_P(0,1,"Turning 'heat' on");
+    Display.printAt_P(0, 1, "Turning 'heat' on");
     digitalWrite(heatingPin, LOW);
     delay(7000);
     Serial.println("Turning off 'heat' and waiting for 3 seconds");
     digitalWrite(heatingPin, HIGH);
-    LCDDisplay.printAt_P(0,1,"Wait - Heat off  ");
+    Display.printAt_P(0, 1, "Wait - Heat off  ");
     delay(3000);
 
 
@@ -97,8 +99,10 @@ void relay_test()
 void LCD_test()
 {
     Serial.println("Beginning LCD test...");
-    LCDDisplay.printAt_P(0,0,"LCD initialized!");
-    LCDDisplay.printAt_P(0,1,"Waiting 5 seconds!");
+
+    Display.IICDisplay->printAt_P(0, 0, "LCD Initialized");
+    Display.printAt_P(0, 0, "LCD initialized!");
+    Display.printAt_P(0, 1, "Waiting 5 seconds!");
     Serial.println("LCD text printed! Waiting 5 seconds...\r\n");
     delay(5000);
 }
@@ -110,11 +114,11 @@ void run_tests()
     delay(50);
 
     LCD_test();
-    run_temp_test(LCDDisplay);
+    run_temp_test();
     relay_test();
     reset_wifi();
-    LCDDisplay.clear();
-    LCDDisplay.printAt_P(0,0,"Done with tests");
+    Display.clear();
+    Display.printAt_P(0, 0, "Done with tests");
 
 }
 
@@ -136,13 +140,15 @@ void setup()
 
 
     Serial.println("Initializing LCD...");
-    LCDDisplay.init();
-    LCDDisplay.updateBacklight();
-    LCDDisplay.clear();
+
+    Display.IICDisplay = &I2C_Display;
+    Display.TFT_Display = &TFT_Display;
+    Display.init();
+    Display.clear();
 
 
     run_tests();
-    
+
 #if defined(ESP32)
     Serial.println("Dropping into rotary encoder test");
     rotaryenc_setup();
@@ -152,8 +158,16 @@ void setup()
 
 void loop()
 {
+#if defined(ESP8266)
     // Do nothing.
-    //delay(2000);
-    rotaryenc_loop();
+    delay(2000);
+#endif
 
+#if defined(ESP32)
+    // Only ESP32 devices currenty support rotary encoders, and of them, only ones with IIC displays.
+    if(Display.has_iic_display) {
+        rotaryenc_loop();
+
+    }
+#endif
 }
