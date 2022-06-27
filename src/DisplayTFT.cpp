@@ -90,7 +90,7 @@ void TFTDisplay::clear(void) {
 
 void TFTDisplay::clearForText(uint8_t start_x, uint8_t start_y, uint16_t color, uint8_t font_size, uint8_t characters) {
     uint8_t width = (font_size * characters * 5) + (font_size * (characters-1) * 4);
-    uint8_t height = font_size * 7;
+    uint8_t height = font_size * 9;
 
     tft.fillRect(start_x, start_y, width, height, color);
 }
@@ -98,7 +98,7 @@ void TFTDisplay::clearForText(uint8_t start_x, uint8_t start_y, uint16_t color, 
 void TFTDisplay::printAt(uint8_t row_num, uint8_t font_size, const char* text) {
 
     uint8_t x = 0;
-    uint8_t y = font_size * 7 * row_num;
+    uint8_t y = font_size * 9 * row_num;
 
     tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
     tft.setTextSize(font_size);
