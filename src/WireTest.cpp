@@ -1,15 +1,28 @@
+#include <Arduino.h>
 #include "WireTest.h"
 
 #include <FS.h>  // Apparently this needs to be first
+
 #if defined(ESP8266)
+
 #include <ESP8266WiFi.h>
-#elif defined(ESP32)
+#include <LittleFS.h>
+#define FILESYSTEM LittleFS
+
+#elif defined(ESP32_STOCK)
+
 #include <WiFi.h>
 #include <SPIFFS.h>
+#define FILESYSTEM SPIFFS
+
+#else
+
+#error "No valid filesystem selection found for this board type!"
+
 #endif
 
 #include <OneWire.h>
-#include <DallasTemperature.h>
+
 #include "LCDDisplay.h"
 #include "OneWireTest.h"
 
@@ -22,7 +35,7 @@ LCDDisplay Display;
 
 void reset_wifi()
 {
-    /* reset_wifi() both resets the WiFi (by running Wifi.disconnect()) and reinitializes SPIFFS */
+    /* reset_wifi() both resets the WiFi (by running Wifi.disconnect()) and reinitializes SPIFFS/LittleFS */
 
     // First, clear everything from serial/LCD
     Display.clear();
@@ -46,16 +59,16 @@ void reset_wifi()
     delay(1000);
     Display.clear();
 
-    // Next, reset (reinitialize) SPIFFS
-    Display.printAt_P(0, 0, "Resetting SPIFFS");
-    Serial.print("\r\n\r\nResetting SPIFFS...\r\n");
+    // Next, reset (reinitialize) SPIFFS/LittleFS
+    Display.printAt_P(0, 0, "Resetting Filesystem");
+    Serial.print("\r\n\r\nResetting Filesystem...\r\n");
     Display.printAt_P(0, 1, "This may take 1min+");
 
-    SPIFFS.begin();
+    FILESYSTEM.begin();
 
-    Serial.println("Please wait up to 30 secs for SPIFFS to be formatted");
-    SPIFFS.format();
-    Serial.println("Spiffs formatted!\r\n");
+    Serial.println("Please wait up to 30 secs for filesystem to be formatted");
+    FILESYSTEM.format();
+    Serial.println("Filesystem formatted!\r\n");
     Display.printAt_P(0, 2, "...done!");
 
     Serial.println("You can now disconnect your ESP and reflash with the final firmware.");

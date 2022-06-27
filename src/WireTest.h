@@ -38,7 +38,7 @@
 #define IIC_SCL NODEMCU_PIN_D1
 
 
-#elif defined(ESP32)
+#elif defined(ESP32_STOCK)
 
 #define heatingPin 25
 #define coolingPin 26
@@ -64,6 +64,8 @@ GND - to microcontroler GND
 #define ROTARY_ENCODER_BUTTON_PIN 0
 #define ROTARY_ENCODER_VCC_PIN -1 /*put -1 of Rotary encoder Vcc is connected directly to 3,3V; else you can use declared output pin for powering rotary encoder */
 
+#else
+#error "No valid pin selection found for this board type!"
 
 #endif
 
