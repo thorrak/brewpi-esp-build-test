@@ -51,18 +51,16 @@
 #define IIC_SCL 22
 
 
-/*
-connecting Rotary encoder
-CLK (A pin) - to any microcontroler intput pin with interrupt -> in this example pin 32
-DT (B pin) - to any microcontroler intput pin with interrupt -> in this example pin 21
-SW (button pin) - to any microcontroler intput pin -> in this example pin 25
-VCC - to microcontroler VCC (then set ROTARY_ENCODER_VCC_PIN -1) or in this example pin 25
-GND - to microcontroler GND
-*/
-#define ROTARY_ENCODER_A_PIN 19
-#define ROTARY_ENCODER_B_PIN 18
-#define ROTARY_ENCODER_BUTTON_PIN 0
-#define ROTARY_ENCODER_VCC_PIN -1 /*put -1 of Rotary encoder Vcc is connected directly to 3,3V; else you can use declared output pin for powering rotary encoder */
+
+#elif defined(ESP32S2)
+
+// This matches the physical pin locations used for the ESP8266 so the PCBs can be reused
+#define heatingPin 5
+#define coolingPin 7
+#define oneWirePin 9
+#define doorPin    11
+#define IIC_SDA 33
+#define IIC_SCL 35
 
 #else
 #error "No valid pin selection found for this board type!"
