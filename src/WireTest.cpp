@@ -11,9 +11,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include "LCDDisplay.h"
-
 #include "OneWireTest.h"
-#include "RotaryEncoderTest.h"
 
 
 IIClcd I2C_Display(0x27, 20, 4);
@@ -100,7 +98,7 @@ void LCD_test()
 {
     Serial.println("Beginning LCD test...");
 
-    Display.IICDisplay->printAt_P(0, 0, "LCD Initialized");
+    // Display.IICDisplay->printAt_P(0, 0, "LCD Initialized");
     Display.printAt_P(0, 0, "LCD initialized!");
     Display.printAt_P(0, 1, "Waiting 5 seconds!");
     Serial.println("LCD text printed! Waiting 5 seconds...\r\n");
@@ -149,25 +147,10 @@ void setup()
 
     run_tests();
 
-#if defined(ESP32)
-    Serial.println("Dropping into rotary encoder test");
-    rotaryenc_setup();
-#endif
-
 }
 
 void loop()
 {
-#if defined(ESP8266)
     // Do nothing.
     delay(2000);
-#endif
-
-#if defined(ESP32)
-    // Only ESP32 devices currenty support rotary encoders, and of them, only ones with IIC displays.
-    if(Display.has_iic_display) {
-        rotaryenc_loop();
-
-    }
-#endif
 }
