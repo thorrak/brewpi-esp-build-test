@@ -20,3 +20,6 @@ CTestTestfile.cmake
 /.pio
 
 .DS_Store
+
+apidocs/
+*.sw?
