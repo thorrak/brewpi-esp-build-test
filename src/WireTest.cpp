@@ -21,6 +21,12 @@
 #include <LittleFS.h>
 #define FILESYSTEM LittleFS
 
+#elif defined(ESP32C3)
+
+#include <WiFi.h>
+#include <SPIFFS.h>
+#define FILESYSTEM SPIFFS
+
 #else
 
 #error "No valid filesystem selection found for this board type!"

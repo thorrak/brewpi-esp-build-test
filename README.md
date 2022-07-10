@@ -75,3 +75,9 @@ ESP32-S2 support targets the [Lolin S2 Mini](https://www.wemos.cc/en/latest/s2/s
 4. Wait several seconds, then release the "0" button
 5. Flash your controller with the desired firmware
 6. Manually press the "RST" button on the left of the board to reset the controller once flashing is complete
+
+
+## ESP32-C3
+
+Although I was experimenting with ESP32-C3 support targeting the [Lolin C3 Mini](https://www.wemos.cc/en/latest/c3/c3_mini.html), v1 builds of this board apparently have significant design flaws which have been reported to cause issues for other projects, and as a result are not yet officially supported by BrewPi-ESP. I have left the code for ESP32-C3 support in this repo in case this changes in the future, but do not recommend its use. 
+

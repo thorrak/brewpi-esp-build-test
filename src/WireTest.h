@@ -62,6 +62,17 @@
 #define IIC_SDA 33
 #define IIC_SCL 35
 
+
+#elif defined(ESP32C3)
+
+// This matches the physical pin locations used for the ESP8266 so the PCBs can be reused
+#define heatingPin 1
+#define coolingPin 2
+#define oneWirePin 3
+#define doorPin    4
+#define IIC_SDA 8
+#define IIC_SCL 10
+
 #else
 #error "No valid pin selection found for this board type!"
 
